@@ -1,0 +1,960 @@
+
+CREATE TABLE cidade (
+       codigo               INTEGER NOT NULL,
+       estado               INTEGER NOT NULL,
+       nome                 VARCHAR(50)
+);
+
+CREATE UNIQUE INDEX XPKcidade ON cidade
+(
+       codigo
+);
+
+CREATE INDEX XIF17cidade ON cidade
+(
+       estado
+);
+
+
+ALTER TABLE cidade
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE email (
+       codigo               INTEGER,
+       pessoa               INTEGER NOT NULL,
+       email                CHAR(50),
+       descricao            VARCHAR(50)
+);
+
+CREATE UNIQUE INDEX XPKemail ON email
+(
+       codigo
+);
+
+CREATE INDEX XIF13email ON email
+(
+       pessoa
+);
+
+
+ALTER TABLE email
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE endereco (
+       codigo               INTEGER NOT NULL,
+       rua                  VARCHAR(50) NOT NULL,
+       numero               INTEGER,
+       cep                  CHAR(9),
+       bairro               CHAR(50),
+       cidade               INTEGER
+);
+
+CREATE UNIQUE INDEX XPKendereco ON endereco
+(
+       codigo
+);
+
+CREATE INDEX XIF18endereco ON endereco
+(
+       cidade
+);
+
+
+ALTER TABLE endereco
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE estado (
+       codigo1              INTEGER NOT NULL,
+       nome                 VARCHAR(50),
+       sigla                CHAR(2)
+);
+
+CREATE UNIQUE INDEX XPKestado ON estado
+(
+       codigo1
+);
+
+
+ALTER TABLE estado
+       ADD PRIMARY KEY (codigo1);
+
+
+CREATE TABLE grupo (
+       codigo               INTEGER NOT NULL,
+       descricao            VARCHAR(50) NOT NULL
+);
+
+CREATE UNIQUE INDEX XPKgrupo ON grupo
+(
+       codigo
+);
+
+
+ALTER TABLE grupo
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE home_page (
+       codigo               INTEGER,
+       pessoa               INTEGER,
+       home_page            CHAR(50),
+       descricao            VARCHAR(50)
+);
+
+CREATE UNIQUE INDEX XPKhome_page ON home_page
+(
+       codigo
+);
+
+CREATE INDEX XIF15home_page ON home_page
+(
+       pessoa
+);
+
+
+ALTER TABLE home_page
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE icq (
+       codigo               INTEGER,
+       pessoa               INTEGER NOT NULL,
+       icq                  INTEGER,
+       descricao            VARCHAR(50)
+);
+
+CREATE UNIQUE INDEX XPKicq ON icq
+(
+       codigo
+);
+
+CREATE INDEX XIF14icq ON icq
+(
+       pessoa
+);
+
+
+ALTER TABLE icq
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE pessoa (
+       codigo               INTEGER,
+       grupo                INTEGER,
+       nome                 VARCHAR(50) NOT NULL,
+       icq                  CHAR(18),
+       data_nascimento      DATE,
+       endereco             INTEGER,
+       Anotacoes            BLOB
+);
+
+CREATE UNIQUE INDEX XPKpessoa ON pessoa
+(
+       codigo
+);
+
+CREATE INDEX XIF12pessoa ON pessoa
+(
+       endereco
+);
+
+CREATE INDEX XIF3pessoa ON pessoa
+(
+       grupo
+);
+
+
+ALTER TABLE pessoa
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE telefone (
+       codigo               INTEGER,
+       tipo                 INTEGER,
+       ddd                  INTEGER,
+       prefixo              INTEGER,
+       numero               INTEGER
+);
+
+CREATE UNIQUE INDEX XPKtelefone ON telefone
+(
+       codigo
+);
+
+CREATE INDEX XIF10telefone ON telefone
+(
+       tipo
+);
+
+
+ALTER TABLE telefone
+       ADD PRIMARY KEY (codigo);
+
+
+CREATE TABLE tipo (
+       codigo               INTEGER NOT NULL,
+       nome                 VARCHAR(50) NOT NULL
+);
+
+CREATE UNIQUE INDEX XPKtipo ON tipo
+(
+       codigo
+);
+
+
+ALTER TABLE tipo
+       ADD PRIMARY KEY (codigo);
+
+
+ALTER TABLE cidade
+       ADD FOREIGN KEY (estado)
+                             REFERENCES estado;
+
+
+ALTER TABLE email
+       ADD FOREIGN KEY (pessoa)
+                             REFERENCES pessoa;
+
+
+ALTER TABLE endereco
+       ADD FOREIGN KEY (cidade)
+                             REFERENCES cidade;
+
+
+ALTER TABLE home_page
+       ADD FOREIGN KEY (pessoa)
+                             REFERENCES pessoa;
+
+
+ALTER TABLE icq
+       ADD FOREIGN KEY (pessoa)
+                             REFERENCES pessoa;
+
+
+ALTER TABLE pessoa
+       ADD FOREIGN KEY (endereco)
+                             REFERENCES endereco;
+
+
+ALTER TABLE pessoa
+       ADD FOREIGN KEY (grupo)
+                             REFERENCES grupo;
+
+
+ALTER TABLE telefone
+       ADD FOREIGN KEY (tipo)
+                             REFERENCES tipo;
+
+
+ALTER TABLE telefone
+       ADD FOREIGN KEY (codigo)
+                             REFERENCES pessoa;
+
+
+
+
+CREATE TRIGGER tD_cidade FOR cidade AFTER DELETE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* DELETE trigger on cidade */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* cidade R/18 endereco ON PARENT DELETE SET NULL */
+    update endereco
+      set
+        /* endereco.cidade = NULL */
+        endereco.cidade = NULL
+      where
+        /* endereco.cidade = OLD.codigo */
+        endereco.cidade = OLD.codigo;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tI_cidade FOR cidade AFTER INSERT AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* INSERT trigger on cidade */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* estado R/17 cidade ON CHILD INSERT SET NULL */
+    update cidade
+      set
+        /* cidade.estado = NULL */
+        cidade.estado = NULL
+      where
+        not exists (
+          select * from estado
+            where
+              /* NEW.estado = estado.codigo1 */
+              NEW.estado = estado.codigo1
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_cidade FOR cidade AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on cidade */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+  /* cidade R/18 endereco ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update endereco
+      set
+        /* endereco.cidade = NULL */
+        endereco.cidade = NULL
+      where
+        /* endereco.cidade = OLD.codigo */
+        endereco.cidade = OLD.codigo;
+  END
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* estado R/17 cidade ON CHILD UPDATE SET NULL */
+    update cidade
+      set
+        /* cidade.estado = NULL */
+        cidade.estado = NULL
+      where
+        not exists (
+          select * from estado
+            where
+              /* NEW.estado = estado.codigo1 */
+              NEW.estado = estado.codigo1
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tI_email FOR email AFTER INSERT AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* INSERT trigger on email */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/13 email ON CHILD INSERT SET NULL */
+    update email
+      set
+        /* email.pessoa = NULL */
+        email.pessoa = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.pessoa = pessoa.codigo */
+              NEW.pessoa = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_email FOR email AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on email */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/13 email ON CHILD UPDATE SET NULL */
+    update email
+      set
+        /* email.pessoa = NULL */
+        email.pessoa = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.pessoa = pessoa.codigo */
+              NEW.pessoa = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tD_endereco FOR endereco AFTER DELETE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* DELETE trigger on endereco */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* endereco R/12 pessoa ON PARENT DELETE SET NULL */
+    update pessoa
+      set
+        /* pessoa.endereco = NULL */
+        pessoa.endereco = NULL
+      where
+        /* pessoa.endereco = OLD.codigo */
+        pessoa.endereco = OLD.codigo;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tI_endereco FOR endereco AFTER INSERT AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* INSERT trigger on endereco */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* cidade R/18 endereco ON CHILD INSERT SET NULL */
+    update endereco
+      set
+        /* endereco.cidade = NULL */
+        endereco.cidade = NULL
+      where
+        not exists (
+          select * from cidade
+            where
+              /* NEW.cidade = cidade.codigo */
+              NEW.cidade = cidade.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_endereco FOR endereco AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on endereco */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+  /* endereco R/12 pessoa ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update pessoa
+      set
+        /* pessoa.endereco = NULL */
+        pessoa.endereco = NULL
+      where
+        /* pessoa.endereco = OLD.codigo */
+        pessoa.endereco = OLD.codigo;
+  END
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* cidade R/18 endereco ON CHILD UPDATE SET NULL */
+    update endereco
+      set
+        /* endereco.cidade = NULL */
+        endereco.cidade = NULL
+      where
+        not exists (
+          select * from cidade
+            where
+              /* NEW.cidade = cidade.codigo */
+              NEW.cidade = cidade.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tD_estado FOR estado AFTER DELETE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* DELETE trigger on estado */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* estado R/17 cidade ON PARENT DELETE SET NULL */
+    update cidade
+      set
+        /* cidade.estado = NULL */
+        cidade.estado = NULL
+      where
+        /* cidade.estado = OLD.codigo1 */
+        cidade.estado = OLD.codigo1;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_estado FOR estado AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on estado */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+  /* estado R/17 cidade ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo1 <> NEW.codigo1 THEN
+  BEGIN
+    update cidade
+      set
+        /* cidade.estado = NULL */
+        cidade.estado = NULL
+      where
+        /* cidade.estado = OLD.codigo1 */
+        cidade.estado = OLD.codigo1;
+  END
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tD_grupo FOR grupo AFTER DELETE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* DELETE trigger on grupo */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* grupo R/3 pessoa ON PARENT DELETE SET NULL */
+    update pessoa
+      set
+        /* pessoa.grupo = NULL */
+        pessoa.grupo = NULL
+      where
+        /* pessoa.grupo = OLD.codigo */
+        pessoa.grupo = OLD.codigo;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_grupo FOR grupo AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on grupo */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+  /* grupo R/3 pessoa ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update pessoa
+      set
+        /* pessoa.grupo = NULL */
+        pessoa.grupo = NULL
+      where
+        /* pessoa.grupo = OLD.codigo */
+        pessoa.grupo = OLD.codigo;
+  END
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tI_home_page FOR home_page AFTER INSERT AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* INSERT trigger on home_page */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/15 home_page ON CHILD INSERT SET NULL */
+    update home_page
+      set
+        /* home_page.pessoa = NULL */
+        home_page.pessoa = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.pessoa = pessoa.codigo */
+              NEW.pessoa = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_home_page FOR home_page AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on home_page */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/15 home_page ON CHILD UPDATE SET NULL */
+    update home_page
+      set
+        /* home_page.pessoa = NULL */
+        home_page.pessoa = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.pessoa = pessoa.codigo */
+              NEW.pessoa = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tI_icq FOR icq AFTER INSERT AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* INSERT trigger on icq */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/14 icq ON CHILD INSERT SET NULL */
+    update icq
+      set
+        /* icq.pessoa = NULL */
+        icq.pessoa = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.pessoa = pessoa.codigo */
+              NEW.pessoa = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_icq FOR icq AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on icq */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/14 icq ON CHILD UPDATE SET NULL */
+    update icq
+      set
+        /* icq.pessoa = NULL */
+        icq.pessoa = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.pessoa = pessoa.codigo */
+              NEW.pessoa = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tD_pessoa FOR pessoa AFTER DELETE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* DELETE trigger on pessoa */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/15 home_page ON PARENT DELETE SET NULL */
+    update home_page
+      set
+        /* home_page.pessoa = NULL */
+        home_page.pessoa = NULL
+      where
+        /* home_page.pessoa = OLD.codigo */
+        home_page.pessoa = OLD.codigo;
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/14 icq ON PARENT DELETE SET NULL */
+    update icq
+      set
+        /* icq.pessoa = NULL */
+        icq.pessoa = NULL
+      where
+        /* icq.pessoa = OLD.codigo */
+        icq.pessoa = OLD.codigo;
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/13 email ON PARENT DELETE SET NULL */
+    update email
+      set
+        /* email.pessoa = NULL */
+        email.pessoa = NULL
+      where
+        /* email.pessoa = OLD.codigo */
+        email.pessoa = OLD.codigo;
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/8 telefone ON PARENT DELETE SET NULL */
+    update telefone
+      set
+        /* telefone.codigo = NULL */
+        telefone.codigo = NULL
+      where
+        /* telefone.codigo = OLD.codigo */
+        telefone.codigo = OLD.codigo;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tI_pessoa FOR pessoa AFTER INSERT AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* INSERT trigger on pessoa */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* endereco R/12 pessoa ON CHILD INSERT SET NULL */
+    update pessoa
+      set
+        /* pessoa.endereco = NULL */
+        pessoa.endereco = NULL
+      where
+        not exists (
+          select * from endereco
+            where
+              /* NEW.endereco = endereco.codigo */
+              NEW.endereco = endereco.codigo
+        ) and
+        /*  */
+        ;
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* grupo R/3 pessoa ON CHILD INSERT SET NULL */
+    update pessoa
+      set
+        /* pessoa.grupo = NULL */
+        pessoa.grupo = NULL
+      where
+        not exists (
+          select * from grupo
+            where
+              /* NEW.grupo = grupo.codigo */
+              NEW.grupo = grupo.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_pessoa FOR pessoa AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on pessoa */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+  /* pessoa R/15 home_page ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update home_page
+      set
+        /* home_page.pessoa = NULL */
+        home_page.pessoa = NULL
+      where
+        /* home_page.pessoa = OLD.codigo */
+        home_page.pessoa = OLD.codigo;
+  END
+
+  /* pessoa R/14 icq ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update icq
+      set
+        /* icq.pessoa = NULL */
+        icq.pessoa = NULL
+      where
+        /* icq.pessoa = OLD.codigo */
+        icq.pessoa = OLD.codigo;
+  END
+
+  /* pessoa R/13 email ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update email
+      set
+        /* email.pessoa = NULL */
+        email.pessoa = NULL
+      where
+        /* email.pessoa = OLD.codigo */
+        email.pessoa = OLD.codigo;
+  END
+
+  /* pessoa R/8 telefone ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update telefone
+      set
+        /* telefone.codigo = NULL */
+        telefone.codigo = NULL
+      where
+        /* telefone.codigo = OLD.codigo */
+        telefone.codigo = OLD.codigo;
+  END
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* endereco R/12 pessoa ON CHILD UPDATE SET NULL */
+    update pessoa
+      set
+        /* pessoa.endereco = NULL */
+        pessoa.endereco = NULL
+      where
+        not exists (
+          select * from endereco
+            where
+              /* NEW.endereco = endereco.codigo */
+              NEW.endereco = endereco.codigo
+        ) and
+        /*  */
+        ;
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* grupo R/3 pessoa ON CHILD UPDATE SET NULL */
+    update pessoa
+      set
+        /* pessoa.grupo = NULL */
+        pessoa.grupo = NULL
+      where
+        not exists (
+          select * from grupo
+            where
+              /* NEW.grupo = grupo.codigo */
+              NEW.grupo = grupo.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tI_telefone FOR telefone AFTER INSERT AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* INSERT trigger on telefone */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* tipo R/10 telefone ON CHILD INSERT SET NULL */
+    update telefone
+      set
+        /* telefone.tipo = NULL */
+        telefone.tipo = NULL
+      where
+        not exists (
+          select * from tipo
+            where
+              /* NEW.tipo = tipo.codigo */
+              NEW.tipo = tipo.codigo
+        ) and
+        /*  */
+        ;
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/8 telefone ON CHILD INSERT SET NULL */
+    update telefone
+      set
+        /* telefone.codigo = NULL */
+        telefone.codigo = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.codigo = pessoa.codigo */
+              NEW.codigo = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_telefone FOR telefone AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on telefone */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* tipo R/10 telefone ON CHILD UPDATE SET NULL */
+    update telefone
+      set
+        /* telefone.tipo = NULL */
+        telefone.tipo = NULL
+      where
+        not exists (
+          select * from tipo
+            where
+              /* NEW.tipo = tipo.codigo */
+              NEW.tipo = tipo.codigo
+        ) and
+        /*  */
+        ;
+
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* pessoa R/8 telefone ON CHILD UPDATE SET NULL */
+    update telefone
+      set
+        /* telefone.codigo = NULL */
+        telefone.codigo = NULL
+      where
+        not exists (
+          select * from pessoa
+            where
+              /* NEW.codigo = pessoa.codigo */
+              NEW.codigo = pessoa.codigo
+        ) and
+        /*  */
+        ;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tD_tipo FOR tipo AFTER DELETE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* DELETE trigger on tipo */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+    /* ERwin Builtin Wed May 31 22:12:39 2006 */
+    /* tipo R/10 telefone ON PARENT DELETE SET NULL */
+    update telefone
+      set
+        /* telefone.tipo = NULL */
+        telefone.tipo = NULL
+      where
+        /* telefone.tipo = OLD.codigo */
+        telefone.tipo = OLD.codigo;
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+
+CREATE TRIGGER tU_tipo FOR tipo AFTER UPDATE AS
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+  /* UPDATE trigger on tipo */
+DECLARE VARIABLE numrows INTEGER;
+BEGIN
+  /* tipo R/10 telefone ON PARENT UPDATE SET NULL */
+  IF
+    /* OLD.codigo <> NEW.codigo THEN
+  BEGIN
+    update telefone
+      set
+        /* telefone.tipo = NULL */
+        telefone.tipo = NULL
+      where
+        /* telefone.tipo = OLD.codigo */
+        telefone.tipo = OLD.codigo;
+  END
+
+
+  /* ERwin Builtin Wed May 31 22:12:39 2006 */
+END !!
+

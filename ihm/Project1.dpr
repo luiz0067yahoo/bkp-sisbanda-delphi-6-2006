@@ -1,0 +1,16 @@
+program Project1;
+
+uses
+  Forms,
+  Unit1 in 'Unit1.pas' {Form1},
+  Unit_grupo in 'Unit_grupo.pas',
+  Unit_endereco in 'Unit_endereco.pas',
+  UValidacao in 'UValidacao.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

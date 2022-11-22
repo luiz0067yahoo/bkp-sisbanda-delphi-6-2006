@@ -1,0 +1,3 @@
+cada pessoa possue um endereço
+cada pessoa pretence a um grupo
+cada pessoa pode possuir um ou mais emails, icqs, home pages. possuem tambem mais de um telefone e cada um deles tem seu tipo predefinidos como pessoal trabalho residencial fax.

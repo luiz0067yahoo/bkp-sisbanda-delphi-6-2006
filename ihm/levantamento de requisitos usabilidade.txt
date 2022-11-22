@@ -1,0 +1,64 @@
+tela de busca
+
+	o menu de botões incluir alterar excluir são icones
+		ordenar alfabeticamente pegar imagem dos icones do jonas
+	
+	No campo nome ou telefone é um edit
+		apenas colocar como nome completo.
+
+	No campo grupo 
+	no campo tipo telefone
+		são combobox
+		deve-se colocar opções de inserções e deleções de grupo
+
+	
+
+incluir pessoa 
+	nome edit
+		não possue validação
+	Grupo combox
+		não posue adição de novos grupos nesta tela e a tela de grupos não prescisa 		mostrar o codigo
+		não possue validação
+	endereço edit
+		não possue validação
+		deveria ser dividido em sub grupos
+		como rua numero
+	Bairro edit
+		não possue validação
+	cep maskedit
+		ok 100%
+	cidade edit
+		poderia haver a seleção de cidade como um combobox para de foma mais 		prescisa alem agilidade.
+	estado combobox
+		não possue adição ou remoção todos os dados foram pré definidos e são 		permanentes
+		tambem deveria de haver junto do cadastro de cidade
+	email edit
+		não possue validação.
+		
+	no home page edit
+		não possue validação
+		tem que ter pelo menos www e 2 pontos 
+	no icq
+		não possue validação
+		é só numero
+	no data nascimento edit masq
+		não possue validação
+		não possue tratamento de exceção
+		poderia ser DateTimePicker
+	no anotações memo
+		não há como colocar tabulações porem se colocar o tab oder não funciona
+	
+
+	inserir telefone na tela de inserir pessoa
+		boa apresentação de muitos para muitos
+		não disponibiliza a criação de mais de um telefone do mesmo tipo
+		os tipo não podem ser mudados
+em todo o sistema apresenta falhas quanto a mensagens de erro que não são claras e objetivas alem de apresentarem enunciado em ingles
+tambem a ausencia de trataticas de erros mostra messagens da ferramenta de forma tecnica para o desenvolverdo apenas entendivel exemplo acess violation
+	neste programa o help está ausente
+
+	sobre apenas tem propaganda do sistema e contato dos seus desenvolvedores
+	config está em ingles deveria ser relativo a coniguraçãoes do sistema com o nome de configuração
+	
+	Sair
+		o usuario clica no sair independente se termina ou não o cadastro fecha o 		sistema sem pedir se ussuario tem certeza de fechar assim ele pode clicar no 		fechar sem intenção.
