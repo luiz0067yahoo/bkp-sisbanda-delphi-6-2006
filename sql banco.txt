@@ -1,0 +1,181 @@
+/*ALTER TABLE "TELEFONE" ADD FOREIGN KEY ("telefone.PESSOA") REFERENCES "pessoa" ("codigo");*/
+/*CREATE TABLE master(pkey int PRIMARY KEY, data varchar(10))
+GO
+CREATE TABLE child (fkey int CONSTRAINT fk_master_child 
+                             FOREIGN KEY (fkey) 
+                             REFERENCES master(pkey) ON DELETE CASCADE
+*/
+/* on delete cascade*/
+/*
+CREATE TABLE reviewing
+(
+reviewingid INTEGER ,
+papername text,
+reviewername text, 
+PRIMARY KEY(reviewingid) 
+);
+
+CREATE TABLE score
+(
+reviewingid integer,
+questionnumber integer,
+score integer,
+FOREIGN KEY (reviewingid) REFERENCES reviewing (reviewingid) on delete cascade
+);
+
+*/
+
+/*
+DROP TABLE telefone;
+DROP TABLE home_page;
+DROP TABLE icq;
+DROP TABLE email;
+DROP TABLE pessoa;
+DROP TABLE endereco;
+DROP TABLE cidade;
+DROP TABLE estado;
+DROP TABLE tipo;
+DROP TABLE grupo;
+*/
+
+
+CREATE TABLE cidade 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       estado               INTEGER NOT NULL,
+       nome                 VARCHAR(50)
+);
+
+
+
+CREATE TABLE email 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       pessoa               INTEGER NOT NULL,
+       email                CHAR(50),
+       descricao            VARCHAR(50)
+);
+
+
+CREATE TABLE endereco 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       rua                  VARCHAR(50) NOT NULL,
+       numero               INTEGER,
+       cep                  CHAR(9),
+       bairro               CHAR(50),
+       cidade               INTEGER
+);
+
+
+CREATE TABLE estado 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       nome                 VARCHAR(50),
+       sigla                CHAR(2)
+);
+
+
+
+CREATE TABLE grupo 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       descricao            VARCHAR(50) NOT NULL
+);
+
+
+CREATE TABLE home_page 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       pessoa               INTEGER,
+       home_page            CHAR(50),
+       descricao            VARCHAR(50)
+);
+
+
+
+CREATE TABLE icq 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       pessoa               INTEGER NOT NULL,
+       icq                  INTEGER,
+       descricao            VARCHAR(50)
+);
+
+
+CREATE TABLE pessoa 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       grupo                INTEGER,
+       nome                 VARCHAR(50) NOT NULL,
+       data_nascimento      DATE,
+       endereco             INTEGER,
+       Anotacoes            BLOB
+);
+
+
+CREATE TABLE telefone 
+(
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       pessoa               integer CONSTRAINT FOREIGN KEY (pessoa) REFERENCES pessoa (codigo),	
+       tipo                 INTEGER,
+       ddd                  INTEGER,
+       prefixo              INTEGER,
+       numero               INTEGER
+);
+
+
+
+CREATE TABLE tipo (
+       codigo               INTEGER NOT NULL PRIMARY KEY,
+       nome                 VARCHAR(50) NOT NULL
+);
+
+
+
+ALTER TABLE cidade
+       ADD FOREIGN KEY (estado)
+                             REFERENCES estado;
+
+
+ALTER TABLE email
+       ADD FOREIGN KEY (pessoa)
+                             REFERENCES pessoa;
+
+
+ALTER TABLE endereco
+       ADD FOREIGN KEY (cidade)
+                             REFERENCES cidade;
+
+
+ALTER TABLE home_page
+       ADD FOREIGN KEY (pessoa)
+                             REFERENCES pessoa;
+
+
+ALTER TABLE icq
+       ADD FOREIGN KEY (pessoa)
+                             REFERENCES pessoa;
+
+
+ALTER TABLE pessoa
+       ADD FOREIGN KEY (endereco)
+                             REFERENCES endereco;
+
+
+ALTER TABLE pessoa
+       ADD FOREIGN KEY (grupo)
+                             REFERENCES grupo;
+
+
+ALTER TABLE telefone
+       ADD FOREIGN KEY (tipo)
+                             REFERENCES tipo;
+
+
+ALTER TABLE telefone
+       ADD FOREIGN KEY (codigo)
+                             REFERENCES pessoa;
+
+
+

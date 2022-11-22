@@ -1,0 +1,193 @@
+unit Unit_tipo;
+
+interface
+
+uses Uvalidacao,SysUtils,Classes,ubanco;
+
+type
+  Tipo = class
+  private
+    { Private declarations }
+    codigo   : Integer;
+    nome       : String;
+  public
+    { Public declarations }
+    function getCodigo : Integer;
+    function getNome    : String;
+
+    function setCodigo (Codigo   : String ) : Boolean;overload;
+    function setnome   (nome     : String ) : Boolean;
+    function setCodigo (Codigo   : integer) : Boolean;overload;
+
+    constructor create;overload;
+    constructor create(Codigo,Nome:string);overload;
+    constructor create(Codigo:integer;nome:string);overload;
+
+    function inserir:boolean;
+    function Alterar(Campobusca,valorbusca,campo,novovalor:string):boolean;overload;
+    function Alterar(Codigo:integer;campo,novovalor:string):boolean;overload;
+    function Alterar(Codigo:string;campo,novovalor:string):boolean;overload;
+
+    function Excluir(Codigo:integer):boolean;overload;
+    function Excluir(Codigo:String):boolean;overload;
+    function Buscar(Codigo:string):tipo; overload;
+    function Buscar(Codigo:integer):tipo; overload;
+    function buscar(campo,valor:string;contem:boolean;proximo:integer):tipo;overload;
+end;
+
+var
+  validar:valida;
+  Tbanco:tdm;
+implementation
+
+{ Endereco }
+
+constructor tipo.create;
+begin
+  validar:=valida.Create;
+  Tbanco:=DM;
+  self.codigo:=0;
+  self.Nome:='';
+end;
+
+constructor tipo.create(Codigo,Nome: string);
+begin
+  validar:=valida.Create;
+  setCodigo(Codigo);
+  setnome(Nome);
+end;
+
+constructor tipo.create(Codigo: integer; nome : string);
+begin
+  validar:=valida.Create;
+  setCodigo(Codigo);
+  setNome(nome);
+end;
+
+function tipo.getNome    : String;
+begin
+  Result:=nome;
+end;
+
+function tipo.getCodigo : Integer;
+begin
+  Result:=codigo;
+end;
+
+function tipo.setNome    (Nome     : String) : Boolean;
+begin
+  if validar.texto('NOME',nome,3,50) then
+  begin
+    Self.nome:=Nome;
+    Result:=true;
+  end
+  else
+    Result:=false;
+end;
+
+function tipo.setCodigo (Codigo : String) : Boolean;
+var
+  resultado:boolean;
+begin
+  resultado:=true;
+  if validar.inteiro('CODIGO',Codigo) then
+    Resultado:=SetCodigo(StrToInt(Codigo))
+  else
+    Resultado:=false;
+  result:=resultado;
+end;
+
+function tipo.setCodigo(Codigo: integer): Boolean;
+var
+  resultado:boolean;
+begin
+  if  validar.inteiro('CODIGO',inttostr(Codigo),1,true) then
+    begin
+      resultado:=true;
+      self.codigo:=Codigo;
+    end
+    else
+    begin
+      resultado:=false;
+    end;
+  result:=resultado;
+end;
+
+function tipo.Excluir(Codigo: integer): boolean;
+begin
+  result:=Tbanco.Deletar('TIPO','CODIGO',inttostr(Codigo))
+end;
+
+function tipo.Excluir(Codigo: String): boolean;
+begin
+  result:=Excluir(strtoint(Codigo));
+end;
+
+function tipo.inserir: boolean;
+begin
+  setCodigo(Tbanco.Autoincremento('TIPO','CODIGO'));
+
+  if setNome(getNome) then
+  begin
+    Tbanco.Inserir
+      (
+         'ENDERECO','',
+         inttostr(getCodigo)+' , '+
+         getNome+' '
+      );
+    result:=true;
+  end
+  else
+    result:=false;
+end;
+
+function tipo.Buscar(Codigo: integer): tipo;
+begin
+  result:=buscar('CODIGO',inttostr(Codigo),false,1);
+end;
+
+function tipo.Buscar(Campo, valor: string; contem: boolean;
+  proximo:integer): tipo;
+begin
+ result:=create
+  (
+    tbanco.buscar('TIPO',campo,valor,'CODIGO',false,proximo),
+    tbanco.buscar('TIPO',campo,valor,'NOME',false,proximo)
+  );
+end;
+
+
+function tipo.Alterar(Campobusca, valorbusca, campo,
+  novovalor: string): boolean;
+begin
+  result:= Tbanco.Alterar('TIPO',Campobusca,valorbusca,campo,novovalor);
+end;
+
+function tipo.Buscar(Codigo: string): tipo;
+var
+  tendereco:tipo;
+begin
+  tendereco.create;
+  if tendereco.setCodigo(Codigo) then
+  begin
+    result:=create
+    (
+    Tbanco.Buscar('TIPO','CODIGO',Codigo,'CODIGO',false,1),
+    Tbanco.Buscar('TIPO','CODIGO',Codigo,'NOME',false,1)
+    )
+  end
+  else
+    result:= tipo.create;
+end;
+
+function tipo.Alterar(Codigo:integer; campo, novovalor: string):boolean;
+begin
+  result:= Tbanco.Alterar('TIPO','CODIGO',inttostr(Codigo),campo,novovalor);
+end;
+
+function tipo.Alterar(Codigo, campo, novovalor: string): boolean;
+begin
+  result:= Tbanco.Alterar('TIPO','CODIGO',Codigo,campo,novovalor);
+end;
+
+end.
